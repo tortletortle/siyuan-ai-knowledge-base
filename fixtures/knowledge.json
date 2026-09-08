@@ -1,0 +1,89 @@
+[
+  {
+    "knowledge_id": "k-timing-sequential",
+    "title": "时序逻辑依赖时钟与状态存储",
+    "summary": "时序逻辑的输出不仅由当前输入决定，还由时钟驱动的历史状态决定。",
+    "body": "时序逻辑通常由触发器或寄存器保存状态，并在时钟事件到来时更新。它是理解状态机和同步计数器的基础。",
+    "topic": "数字 IC/时序逻辑",
+    "status": "active",
+    "source_ids": ["src-ic-course", "src-verilog-guide"],
+    "relations": [
+      {"type": "prerequisite_of", "target": "k-fsm"},
+      {"type": "contrasts_with", "target": "k-combinational"}
+    ],
+    "evidence": [
+      {"source_id": "src-ic-course", "locator": "第 2 讲 08:10-10:22", "quote": "状态由时钟事件驱动更新。"},
+      {"source_id": "src-verilog-guide", "locator": "§3.1", "quote": "Sequential logic stores state between clock events."}
+    ]
+  },
+  {
+    "knowledge_id": "k-combinational",
+    "title": "组合逻辑只由当前输入决定",
+    "summary": "组合逻辑没有内部状态，输出是当前输入的函数。",
+    "body": "组合逻辑不依赖时钟，也不保存历史值；典型例子包括加法器、译码器和多路选择器。",
+    "topic": "数字 IC/组合逻辑",
+    "status": "active",
+    "source_ids": ["src-ic-course"],
+    "relations": [
+      {"type": "contrasts_with", "target": "k-timing-sequential"}
+    ],
+    "evidence": [
+      {"source_id": "src-ic-course", "locator": "第 1 讲 12:04-13:40", "quote": "组合逻辑的输出只取决于当前输入。"}
+    ]
+  },
+  {
+    "knowledge_id": "k-fsm",
+    "title": "有限状态机由状态、转移和输出组成",
+    "summary": "有限状态机用有限个状态表示行为，并依据输入和时钟在状态之间转移。",
+    "body": "FSM 的建模至少需要状态寄存器、下一状态逻辑和输出逻辑。设计前应先掌握时序逻辑与组合逻辑。",
+    "topic": "数字 IC/状态机",
+    "status": "active",
+    "source_ids": ["src-ic-course", "src-verilog-guide"],
+    "relations": [
+      {"type": "belongs_to", "target": "k-digital-design"},
+      {"type": "prerequisite_of", "target": "k-counter"}
+    ],
+    "evidence": [
+      {"source_id": "src-ic-course", "locator": "第 4 讲 02:15-05:48", "quote": "状态机由状态、转移和输出三部分构成。"}
+    ]
+  },
+  {
+    "knowledge_id": "k-digital-design",
+    "title": "数字 IC 设计以可验证的逻辑模型为核心",
+    "summary": "数字 IC 设计需要把功能、时序和验证约束落实为可实现的逻辑模型。",
+    "body": "设计流程通常包含规格、RTL 建模、仿真、综合和验证等阶段。",
+    "topic": "数字 IC/基础",
+    "status": "active",
+    "source_ids": ["src-ic-course"],
+    "relations": [],
+    "evidence": [
+      {"source_id": "src-ic-course", "locator": "课程导论 01:20-03:05", "quote": "从规格到验证需要保持模型和约束的一致。"}
+    ]
+  },
+  {
+    "knowledge_id": "k-counter",
+    "title": "同步计数器在同一时钟沿更新状态",
+    "summary": "同步计数器让所有状态寄存器使用同一时钟，在统一时刻完成计数状态更新。",
+    "body": "同步计数器通常由状态寄存器和下一状态组合逻辑组成，设计时要检查复位和溢出行为。",
+    "topic": "数字 IC/计数器",
+    "status": "active",
+    "source_ids": ["src-verilog-guide"],
+    "relations": [],
+    "evidence": [
+      {"source_id": "src-verilog-guide", "locator": "§5.2", "quote": "All counter registers update on the same clock edge."}
+    ]
+  },
+  {
+    "knowledge_id": "k-old-fsm",
+    "title": "旧版状态机示例",
+    "summary": "这是已被新课程示例替代的旧状态机说明，不应作为当前答案依据。",
+    "body": "旧版示例使用过时的复位约定，仅用于追溯历史。",
+    "topic": "数字 IC/状态机",
+    "status": "deprecated",
+    "source_ids": ["src-old-notes"],
+    "relations": [{"type": "supersedes", "target": "k-fsm"}],
+    "evidence": [
+      {"source_id": "src-old-notes", "locator": "legacy.md#12", "quote": "Legacy example."}
+    ]
+  }
+]

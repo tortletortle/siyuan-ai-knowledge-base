@@ -1,0 +1,5 @@
+[
+  {"source_id":"src-ic-course","source_type":"video","title":"数字 IC 基础课程","locator_type":"timestamp","uri":"course://digital-ic/intro","published_at":"2026-08-01","trust":"high"},
+  {"source_id":"src-verilog-guide","source_type":"pdf","title":"Verilog 建模指南","locator_type":"section","uri":"file://verilog-guide.pdf","published_at":"2025-11-10","trust":"high"},
+  {"source_id":"src-old-notes","source_type":"markdown","title":"旧版状态机笔记","locator_type":"heading","uri":"file://legacy.md","published_at":"2023-01-03","trust":"low"}
+]
