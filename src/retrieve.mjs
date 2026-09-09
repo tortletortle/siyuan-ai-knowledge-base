@@ -1,6 +1,6 @@
 const STOP_WORDS = new Set(['什么', '如何', '怎么', '哪些', '请问', '一下', '需要', '了解', '这个', '那个', '前要', '之前', '有什么', '完全', '没有', '出现在', '课程', '里的', '这', '个']);
 
-function normalize(text) { return String(text).toLowerCase().replace(/\s+/g, ''); }
+function normalize(text) { return String(text).toLowerCase().replace(/\s+/g, ' '); }
 function aliasTerms(text, aliases = []) {
   const value = normalize(text);
   const matched = [];
@@ -49,13 +49,12 @@ export function retrieve({ knowledge, sources, aliases = [] }, query, options = 
   const activeOnly = options.activeOnly ?? true;
   const intent = options.intent ?? detectIntent(query);
   const mode = options.mode ?? (intent === 'evidence' ? 'evidence' : 'summary');
-  const queryLooksOutOfDomain = /量子|react|useeffect|计算机视觉|区块链/iu.test(query);
   const queryTerms = terms(query, aliases);
   const queryAliases = aliasVariants(query, aliases);
   const candidates = knowledge.filter((item) => (!activeOnly || item.status === 'active') && inScope(item, options));
   const ranked = candidates.map((item) => { const result = score(item, [...queryTerms, ...queryAliases], aliases); return { item, score: result.points, matches: result.matches, alias_hits: aliasTerms(`${item.title} ${item.summary} ${item.body}`, aliases) }; })
-    .filter(({ score: itemScore, matches }) => !queryLooksOutOfDomain && itemScore >= (options.minScore ?? (queryTerms.length >= 3 ? 3 : 2)) && (options.minScore !== undefined || matches.some((match) => match.field === 'title' || match.field === 'alias') || itemScore >= 3))
-    .sort((a, b) => b.score - a.score || b.matches.filter((match) => match.field === 'title').length - a.matches.filter((match) => match.field === 'title').length || a.item.title.localeCompare(b.item.title));
+    .filter(({ score: itemScore, matches }) => itemScore >= (options.minScore ?? (queryTerms.length >= 3 ? 3 : 2)) && (options.minScore !== undefined || matches.some((match) => match.field === 'title' || match.field === 'alias') || itemScore >= 3))
+    .sort((a, b) => b.score - a.score || b.matches.filter((match) => match.field === 'title').length - a.matches.filter((match) => match.field === 'title').length || b.matches.filter((match) => match.field === 'alias').length - a.matches.filter((match) => match.field === 'alias').length || a.item.title.localeCompare(b.item.title) || a.item.knowledge_id.localeCompare(b.item.knowledge_id));
   const directLimit = options.limit ?? (intent === 'prerequisite' ? 1 : 2);
   const direct = ranked.slice(0, directLimit);
   const directIds = new Set(direct.map(({ item }) => item.knowledge_id));

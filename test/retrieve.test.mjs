@@ -42,8 +42,20 @@ test('deprecated 内容不会进入默认检索', () => {
   assert.equal(result.neighbors.some(({ item }) => item.knowledge_id === 'k-old-fsm'), false);
 });
 
+test('课程过滤不会召回其他课程条目', () => {
+  const scoped = retrieve({ ...dataset, knowledge: dataset.knowledge.map((item) => ({ ...item, course_id: item.knowledge_id === 'k-fsm' ? 'digital' : 'other' })) }, 'FSM 是什么', { courseId: 'digital' });
+  assert.ok(scoped.direct.every(({ item }) => item.course_id === 'digital'));
+});
+
+test('域外词不阻止合法知识命中', () => {
+  const extended = { ...dataset, knowledge: [...dataset.knowledge, { knowledge_id: 'k-react', title: 'React useEffect 清理副作用', summary: 'React 内容', body: 'useEffect cleanup', topic: 'React', status: 'active', source_ids: [], relations: [], evidence: [] }] };
+  const result = retrieve(extended, 'React useEffect', { minScore: 1 });
+  assert.equal(result.direct[0].item.knowledge_id, 'k-react');
+});
+
 test('无答案时返回空命中而不是伪造结果', () => {
   const result = retrieve(dataset, '量子计算纠错');
   assert.equal(result.direct.length, 0);
   assert.equal(result.neighbors.length, 0);
 });
+
