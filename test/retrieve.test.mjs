@@ -8,17 +8,32 @@ import { retrieve } from '../src/retrieve.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dataset = await loadDataset({ knowledgePath: join(root, 'fixtures/knowledge.json'), sourcesPath: join(root, 'fixtures/sources.json') });
 
-test('精确问题命中 active 知识并返回证据', () => {
+test('精确问题命中 active 知识', () => {
   const result = retrieve(dataset, '时序逻辑依赖什么');
   assert.equal(result.direct[0].item.knowledge_id, 'k-timing-sequential');
-  assert.ok(result.evidence.some((entry) => entry.source_id === 'src-ic-course'));
-  assert.ok(result.metrics.contextChars < 900);
+  assert.equal(result.evidence.length, 0);
+  assert.ok(result.metrics.contextChars < 500);
 });
 
-test('关系问题扩展前置知识', () => {
+test('关系问题按方向扩展前置知识', () => {
   const result = retrieve(dataset, '学习状态机前需要什么');
+  assert.equal(result.intent, 'prerequisite');
   assert.equal(result.direct[0].item.knowledge_id, 'k-fsm');
-  assert.ok(result.neighbors.some(({ item, via }) => item.knowledge_id === 'k-counter' || via.type === 'belongs_to'));
+  assert.ok(result.neighbors.some(({ item }) => item.knowledge_id === 'k-timing-sequential'));
+});
+
+test('摘要模式不默认加载正文和证据', () => {
+  const result = retrieve(dataset, 'FSM 是什么');
+  assert.equal(result.mode, 'summary');
+  assert.equal(result.evidence.length, 0);
+  assert.equal(result.context.includes('正文：'), false);
+});
+
+test('证据模式才加载可定位来源', () => {
+  const result = retrieve(dataset, 'FSM 的来源是什么', { mode: 'evidence' });
+  assert.equal(result.intent, 'evidence');
+  assert.ok(result.evidence.length > 0);
+  assert.ok(result.evidence.every((entry) => entry.locator));
 });
 
 test('deprecated 内容不会进入默认检索', () => {
