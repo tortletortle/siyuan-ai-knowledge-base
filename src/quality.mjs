@@ -33,6 +33,7 @@ export function evaluateQueries(dataset, cases, retrieveFn) {
       expected_ids: [...expected],
       direct_ids: directIds,
       first_relevant_rank: rank,
+      hit_at_1: rank === 1,
       answer_hit: answerHit,
       any_hit: anyHit,
       all_hit: allHit,
