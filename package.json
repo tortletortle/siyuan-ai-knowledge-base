@@ -7,6 +7,7 @@
     "query": "node src/cli.mjs",
     "demo": "node src/cli.mjs --demo",
     "audit:siyuan": "node scripts/siyuan-audit.mjs",
-    "eval:transcripts": "node scripts/transcript-eval.mjs"
+    "eval:transcripts": "node scripts/transcript-eval.mjs",
+    "eval:quality": "node scripts/quality-eval.mjs"
   }
 }

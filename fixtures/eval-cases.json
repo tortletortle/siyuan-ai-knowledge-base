@@ -1,0 +1,7 @@
+[
+  {"id":"fsm-definition","query":"FSM 是什么","expected_ids":["k-fsm"]},
+  {"id":"timing-prerequisite","query":"学习状态机前需要什么","expected_ids":["k-fsm"],"options":{"mode":"explanation"}},
+  {"id":"old-version","query":"旧版状态机示例","expected_ids":[]},
+  {"id":"unknown","query":"量子计算纠错","expected_ids":[]},
+  {"id":"evidence","query":"FSM 的来源是什么","expected_ids":["k-fsm"],"requires_evidence":true,"options":{"mode":"evidence"}}
+]
