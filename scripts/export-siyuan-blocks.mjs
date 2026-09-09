@@ -1,0 +1,20 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+
+const API = process.env.SIYUAN_API ?? 'http://127.0.0.1:6806';
+const token = (process.env.SIYUAN_TOKEN ?? '').trim();
+const output = process.env.SIYUAN_SNAPSHOT_OUTPUT;
+if (!token) throw new Error('SIYUAN_TOKEN is required');
+if (!output) throw new Error('SIYUAN_SNAPSHOT_OUTPUT is required');
+const url = new URL(API);
+if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(url.hostname) || (url.port || '80') !== '6806') throw new Error('refusing non-local SiYuan API');
+const response = await fetch(`${API}/api/query/sql`, { method: 'POST', headers: { Authorization: `Token ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ stmt: "SELECT id,root_id,parent_id,type,subtype,content,markdown,ial,box FROM blocks LIMIT 250000" }), redirect: 'error' });
+if (!response.ok) throw new Error(`SiYuan HTTP ${response.status}`);
+const payload = await response.json();
+if (payload.code !== 0) throw new Error(`SiYuan API code ${payload.code}`);
+const blocks = payload.data ?? [];
+const snapshot = { schema_version: 1, fetched_at: new Date().toISOString(), policy: 'read-only local sample snapshot', truncated: blocks.length >= 250000, blocks };
+const target = resolve(output);
+await mkdir(dirname(target), { recursive: true });
+await writeFile(target, JSON.stringify(snapshot, null, 2), 'utf8');
+console.log(JSON.stringify({ output: target, block_count: blocks.length, truncated: snapshot.truncated }, null, 2));
