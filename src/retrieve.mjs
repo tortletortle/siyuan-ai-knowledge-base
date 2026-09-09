@@ -1,4 +1,4 @@
-const STOP_WORDS = new Set(['什么', '如何', '怎么', '哪些', '请问', '一下', '需要', '了解', '这个', '那个', '前要', '之前', '有什么']);
+const STOP_WORDS = new Set(['什么', '如何', '怎么', '哪些', '请问', '一下', '需要', '了解', '这个', '那个', '前要', '之前', '有什么', '完全', '没有', '出现在', '课程', '里的', '这', '个']);
 const ALIASES = new Map([
   ['fsm', '有限状态机'],
   ['finite state machine', '有限状态机'],
@@ -60,7 +60,7 @@ export function retrieve({ knowledge, sources }, query, options = {}) {
   const candidates = knowledge.filter((item) => (!activeOnly || item.status === 'active') && (!topic || item.topic.startsWith(topic)));
   const queryTerms = terms(query);
   const ranked = candidates.map((item) => ({ item, score: score(item, queryTerms) }))
-    .filter(({ score: itemScore }) => itemScore >= 2)
+    .filter(({ score: itemScore }) => itemScore >= (options.minScore ?? (queryTerms.length >= 3 ? 3 : 2)))
     .sort((a, b) => b.score - a.score || a.item.title.localeCompare(b.item.title));
   const directLimit = options.limit ?? (intent === 'prerequisite' ? 1 : 2);
   const direct = ranked.slice(0, directLimit);
