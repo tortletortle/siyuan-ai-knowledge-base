@@ -10,6 +10,7 @@
     "eval:transcripts": "node scripts/transcript-eval.mjs",
     "eval:quality": "node scripts/quality-eval.mjs",
     "inspect:siyuan": "node scripts/inspect-siyuan-snapshot.mjs",
-    "eval:external": "node scripts/quality-eval.mjs"
+    "eval:external": "node scripts/quality-eval.mjs",
+    "normalize:siyuan": "node scripts/normalize-siyuan-snapshot.mjs"
   }
 }
