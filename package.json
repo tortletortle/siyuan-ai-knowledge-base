@@ -5,6 +5,10 @@
   "scripts": {
     "test": "node --test",
     "query": "node src/cli.mjs",
-    "demo": "node src/cli.mjs --demo"
+    "demo": "node src/cli.mjs --demo",
+    "audit": "node scripts/siyuan-audit.mjs --dry-run",
+    "audit:live": "node scripts/siyuan-audit.mjs",
+    "baseline": "node scripts/baseline.mjs",
+    "report": "node scripts/report.mjs"
   }
 }

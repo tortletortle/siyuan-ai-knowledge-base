@@ -1,0 +1,174 @@
+[
+  {
+    "id": "20260801120001-coord-p1",
+    "root_id": "20260801120000-coord01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "坐标空间定义了物体位置和方向的参照系。在游戏开发中，常见的坐标空间包括模型空间、世界空间、观察空间和屏幕空间。",
+    "markdown": "坐标空间定义了物体位置和方向的参照系。在游戏开发中，常见的坐标空间包括模型空间、世界空间、观察空间和屏幕空间。",
+    "sort": 0,
+    "ial": ""
+  },
+  {
+    "id": "20260801120002-coord-h1",
+    "root_id": "20260801120000-coord01",
+    "box": "nb-game-dev",
+    "type": "h",
+    "content": "坐标转换的核心是矩阵运算",
+    "markdown": "## 坐标转换的核心是矩阵运算",
+    "sort": 1,
+    "ial": ""
+  },
+  {
+    "id": "20260801120003-coord-p2",
+    "root_id": "20260801120000-coord01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "从一个坐标空间转换到另一个坐标空间，需要通过变换矩阵（平移、旋转、缩放）来实现。MVP 矩阵 = Model × View × Projection。",
+    "markdown": "从一个坐标空间转换到另一个坐标空间，需要通过变换矩阵（平移、旋转、缩放）来实现。MVP 矩阵 = Model × View × Projection。",
+    "sort": 2,
+    "ial": ""
+  },
+  {
+    "id": "20260801120004-coord-p3",
+    "root_id": "20260801120000-coord01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "理解坐标转换前需要先掌握向量与矩阵运算((20260701090000-math01))和线性代数基础。",
+    "markdown": "理解坐标转换前需要先掌握向量与矩阵运算((20260701090000-math01))和线性代数基础。",
+    "sort": 3,
+    "ial": ""
+  },
+  {
+    "id": "20260801120005-coord-p4",
+    "root_id": "20260801120000-coord01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "坐标转换在渲染管线中用于将 3D 世界坐标映射到 2D 屏幕像素，是相机系统和 UI 叠加的基础。",
+    "markdown": "坐标转换在渲染管线中用于将 3D 世界坐标映射到 2D 屏幕像素，是相机系统和 UI 叠加的基础。",
+    "sort": 4,
+    "ial": ""
+  },
+
+  {
+    "id": "20260715100001-label-p1",
+    "root_id": "20260715100000-label01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "Label 组件用于在游戏界面中显示文本。它支持富文本、多行排版、溢出模式和位图字体。",
+    "markdown": "Label 组件用于在游戏界面中显示文本。它支持富文本、多行排版、溢出模式和位图字体。",
+    "sort": 0,
+    "ial": ""
+  },
+  {
+    "id": "20260715100002-label-h1",
+    "root_id": "20260715100000-label01",
+    "box": "nb-game-dev",
+    "type": "h",
+    "content": "Label 组件的核心属性",
+    "markdown": "## Label 组件的核心属性",
+    "sort": 1,
+    "ial": ""
+  },
+  {
+    "id": "20260715100003-label-p2",
+    "root_id": "20260715100000-label01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "Label 的关键属性包括：string（文本内容）、fontSize（字号）、fontFamily（字体）、lineHeight（行高）、overflow（溢出策略：CLAMP / SHRINK / RESIZE）和 horizontalAlign / verticalAlign（对齐方式）。",
+    "markdown": "Label 的关键属性包括：string（文本内容）、fontSize（字号）、fontFamily（字体）、lineHeight（行高）、overflow（溢出策略：CLAMP / SHRINK / RESIZE）和 horizontalAlign / verticalAlign（对齐方式）。",
+    "sort": 2,
+    "ial": ""
+  },
+  {
+    "id": "20260715100004-label-p3",
+    "root_id": "20260715100000-label01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "Label 与 RichText 的区别在于：Label 支持位图字体但格式控制较少，RichText 支持更复杂的内联样式但性能开销更大。详见((20260710100000-richtext01))。",
+    "markdown": "Label 与 RichText 的区别在于：Label 支持位图字体但格式控制较少，RichText 支持更复杂的内联样式但性能开销更大。详见((20260710100000-richtext01))。",
+    "sort": 3,
+    "ial": ""
+  },
+  {
+    "id": "20260715100005-label-p4",
+    "root_id": "20260715100000-label01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "Label 组件属于 UI 渲染层((20260601100000-uirender01))，在 Widget 组件管理下参与布局计算。",
+    "markdown": "Label 组件属于 UI 渲染层((20260601100000-uirender01))，在 Widget 组件管理下参与布局计算。",
+    "sort": 4,
+    "ial": ""
+  },
+  {
+    "id": "20260715100006-label-card",
+    "root_id": "20260715100000-label01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "闪卡复习：Label overflow 模式？答：三种。",
+    "markdown": "闪卡复习：Label overflow 模式？答：三种。",
+    "sort": 5,
+    "ial": "data-type=\"card\" data-card-id=\"card-label-01\""
+  },
+
+  {
+    "id": "20260620140001-spine-p1",
+    "root_id": "20260620140000-spine01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "SPINE 是一种 2D 骨骼动画工具，通过骨骼绑定和网格变形实现高效的角色动画。相比帧动画，SPINE 的资源体积更小、动画过渡更平滑。",
+    "markdown": "SPINE 是一种 2D 骨骼动画工具，通过骨骼绑定和网格变形实现高效的角色动画。相比帧动画，SPINE 的资源体积更小、动画过渡更平滑。",
+    "sort": 0,
+    "ial": ""
+  },
+  {
+    "id": "20260620140002-spine-h1",
+    "root_id": "20260620140000-spine01",
+    "box": "nb-game-dev",
+    "type": "h",
+    "content": "SPINE 运行时集成",
+    "markdown": "## SPINE 运行时集成",
+    "sort": 1,
+    "ial": ""
+  },
+  {
+    "id": "20260620140003-spine-p2",
+    "root_id": "20260620140000-spine01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "在引擎中集成 SPINE 需要三个文件：.json（骨骼数据）、.atlas（图集描述）和 .png（纹理贴图）。SpineSkeleton 组件负责加载和播放，SpineSlot 管理插槽和附件。",
+    "markdown": "在引擎中集成 SPINE 需要三个文件：.json（骨骼数据）、.atlas（图集描述）和 .png（纹理贴图）。SpineSkeleton 组件负责加载和播放，SpineSlot 管理插槽和附件。",
+    "sort": 2,
+    "ial": ""
+  },
+  {
+    "id": "20260620140004-spine-p3",
+    "root_id": "20260620140000-spine01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "SPINE 与帧动画((20260610120000-frameanim01))的对比：SPINE 适合角色和复杂动作，帧动画适合简单特效和像素风格。两者可以混合使用。",
+    "markdown": "SPINE 与帧动画((20260610120000-frameanim01))的对比：SPINE 适合角色和复杂动作，帧动画适合简单特效和像素风格。两者可以混合使用。",
+    "sort": 3,
+    "ial": ""
+  },
+  {
+    "id": "20260620140005-spine-p4",
+    "root_id": "20260620140000-spine01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "使用 SPINE 前应先理解坐标空间与坐标转换((20260801120000-coord01))，因为骨骼的世界坐标需要通过矩阵链计算得出。",
+    "markdown": "使用 SPINE 前应先理解坐标空间与坐标转换((20260801120000-coord01))，因为骨骼的世界坐标需要通过矩阵链计算得出。",
+    "sort": 4,
+    "ial": ""
+  },
+  {
+    "id": "20260620140006-spine-p5",
+    "root_id": "20260620140000-spine01",
+    "box": "nb-game-dev",
+    "type": "p",
+    "content": "SPINE 动画的 Skin 系统允许运行时替换骨骼附件，用于角色换装和多皮肤支持。Skin 通过名称查找 Slot-Attachment 映射。",
+    "markdown": "SPINE 动画的 Skin 系统允许运行时替换骨骼附件，用于角色换装和多皮肤支持。Skin 通过名称查找 Slot-Attachment 映射。",
+    "sort": 5,
+    "ial": ""
+  }
+]

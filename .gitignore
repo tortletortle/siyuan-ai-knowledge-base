@@ -1,1 +1,7 @@
 .mimosa/
+
+# Never commit credentials
+token.txt
+*.token
+.env
+.env.local

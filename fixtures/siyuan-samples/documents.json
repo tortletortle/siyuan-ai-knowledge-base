@@ -1,0 +1,38 @@
+[
+  {
+    "id": "20260801120000-coord01",
+    "root_id": "20260801120000-coord01",
+    "box": "nb-game-dev",
+    "path": "/数学基础/坐标空间与坐标转换.sy",
+    "hpath": "/数学基础/坐标空间与坐标转换",
+    "type": "d",
+    "content": "坐标空间与坐标转换",
+    "markdown": "",
+    "created": "20260801120000",
+    "updated": "20260901150000"
+  },
+  {
+    "id": "20260715100000-label01",
+    "root_id": "20260715100000-label01",
+    "box": "nb-game-dev",
+    "path": "/UI 组件/Label 组件.sy",
+    "hpath": "/UI 组件/Label 组件",
+    "type": "d",
+    "content": "Label 组件",
+    "markdown": "",
+    "created": "20260715100000",
+    "updated": "20260820180000"
+  },
+  {
+    "id": "20260620140000-spine01",
+    "root_id": "20260620140000-spine01",
+    "box": "nb-game-dev",
+    "path": "/动画系统/SPINE 骨骼动画.sy",
+    "hpath": "/动画系统/SPINE 骨骼动画",
+    "type": "d",
+    "content": "SPINE 骨骼动画",
+    "markdown": "",
+    "created": "20260620140000",
+    "updated": "20260830120000"
+  }
+]
