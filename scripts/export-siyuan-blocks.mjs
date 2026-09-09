@@ -8,7 +8,7 @@ if (!token) throw new Error('SIYUAN_TOKEN is required');
 if (!output) throw new Error('SIYUAN_SNAPSHOT_OUTPUT is required');
 const url = new URL(API);
 if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(url.hostname) || (url.port || '80') !== '6806') throw new Error('refusing non-local SiYuan API');
-const response = await fetch(`${API}/api/query/sql`, { method: 'POST', headers: { Authorization: `Token ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ stmt: "SELECT id,root_id,parent_id,type,subtype,content,markdown,ial,box FROM blocks LIMIT 250000" }), redirect: 'error' });
+const response = await fetch(`${API}/api/query/sql`, { method: 'POST', headers: { ...(token ? { Authorization: `Token ${token}` } : {}), 'Content-Type': 'application/json' }, body: JSON.stringify({ stmt: "SELECT id,root_id,parent_id,type,subtype,content,markdown,ial,box FROM blocks LIMIT 250000" }), redirect: 'error' });
 if (!response.ok) throw new Error(`SiYuan HTTP ${response.status}`);
 const payload = await response.json();
 if (payload.code !== 0) throw new Error(`SiYuan API code ${payload.code}`);

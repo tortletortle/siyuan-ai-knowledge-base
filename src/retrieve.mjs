@@ -1,6 +1,6 @@
 const STOP_WORDS = new Set(['什么', '如何', '怎么', '哪些', '请问', '一下', '需要', '了解', '这个', '那个', '前要', '之前', '有什么', '完全', '没有', '出现在', '课程', '里的', '这', '个']);
 
-function normalize(text) { return String(text).toLowerCase().replace(/\s+/g, ' '); }
+function normalize(text) { return String(text).toLowerCase().replace(/([a-z\d])([\u3400-\u9fff])/gu, '$1 $2').replace(/([\u3400-\u9fff])([a-z\d])/gu, '$1 $2').replace(/\s+/g, ' '); }
 function aliasTerms(text, aliases = []) {
   const value = normalize(text);
   const matched = [];
@@ -18,7 +18,7 @@ function terms(text, aliases = []) {
   const expanded = aliasMatches.flatMap((canonical) => [canonical, ...aliases.filter((entry) => entry.canonical === canonical).flatMap((entry) => entry.aliases ?? [])]);
   const bigrams = [];
   for (const word of words) if (/^[\u3400-\u9fff]+$/u.test(word) && word.length > 1) for (let i = 0; i < word.length - 1; i += 1) bigrams.push(word.slice(i, i + 2));
-  return [...new Set([...words, ...bigrams, ...expanded.flatMap((value) => normalize(value).split(/\s+/))].filter((term) => !STOP_WORDS.has(term)))];
+  return [...new Set([...words, ...bigrams, ...expanded.flatMap((value) => normalize(value).split(/\s+/))].filter((term) => !STOP_WORDS.has(term) && term))];
 }
 export function detectIntent(query) {
   if (/前置|之前|先学|基础|依赖|前.*需要/u.test(query)) return 'prerequisite';
