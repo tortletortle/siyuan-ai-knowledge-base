@@ -56,7 +56,15 @@ export function retrieve({ knowledge, sources, aliases = [] }, query, options = 
     .filter(({ score: itemScore, matches }) => itemScore >= (options.minScore ?? (queryTerms.length >= 3 ? 3 : 2)) && (options.minScore !== undefined || matches.some((match) => match.field === 'title' || match.field === 'alias') || itemScore >= 3))
     .sort((a, b) => b.score - a.score || b.matches.filter((match) => match.field === 'title').length - a.matches.filter((match) => match.field === 'title').length || b.matches.filter((match) => match.field === 'alias').length - a.matches.filter((match) => match.field === 'alias').length || a.item.title.localeCompare(b.item.title) || a.item.knowledge_id.localeCompare(b.item.knowledge_id));
   const directLimit = options.limit ?? (intent === 'prerequisite' ? 1 : 2);
-  const direct = ranked.slice(0, directLimit);
+  const dedupedRanked = [];
+  const seenTexts = new Set();
+  for (const candidate of ranked) {
+    const key = candidate.item.text_normalized ?? candidate.item.body?.toLowerCase().replace(/\s+/g, ' ');
+    if (seenTexts.has(key)) continue;
+    seenTexts.add(key);
+    dedupedRanked.push(candidate);
+  }
+  const direct = dedupedRanked.slice(0, directLimit);
   const directIds = new Set(direct.map(({ item }) => item.knowledge_id));
   const byId = new Map(knowledge.map((item) => [item.knowledge_id, item]));
   const relationTypes = allowedRelationTypes(intent);
