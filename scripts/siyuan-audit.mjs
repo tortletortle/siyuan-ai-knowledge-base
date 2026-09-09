@@ -2,7 +2,6 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const API = process.env.SIYUAN_API ?? 'http://127.0.0.1:6806';
-const TOKEN_FILE = resolve(process.env.SIYUAN_TOKEN_FILE ?? 'C:/Users/tortl/AI/tools/siyuan/token.txt');
 const NOTEBOOK = process.env.SIYUAN_NOTEBOOK ?? 'AI学习笔记';
 const SAMPLE_IDS = new Set([
   'src-12b60e80b3f4',
@@ -10,7 +9,6 @@ const SAMPLE_IDS = new Set([
   'src-0ede861fcfaf'
 ]);
 
-function quote(value) { return String(value).replaceAll("'", "''"); }
 function assertLoopback() {
   const url = new URL(API);
   if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(url.hostname) || (url.port || '80') !== '6806') {
@@ -18,8 +16,8 @@ function assertLoopback() {
   }
 }
 async function token() {
-  const value = (await readFile(TOKEN_FILE, 'utf8')).trim();
-  if (!value) throw new Error(`token file is empty: ${TOKEN_FILE}`);
+  const value = (process.env.SIYUAN_TOKEN ?? '').trim();
+  if (!value) throw new Error('SIYUAN_TOKEN is required');
   return value;
 }
 async function api(path, payload, auth) {
@@ -48,17 +46,18 @@ const auth = await token();
 const notebooks = await api('/api/notebook/lsNotebooks', {}, auth);
 const notebook = (notebooks.notebooks ?? []).find((item) => item.name === NOTEBOOK && !item.closed);
 if (!notebook) throw new Error(`notebook not found: ${NOTEBOOK}`);
-const box = quote(notebook.id);
-const docs = await sql(auth, `SELECT id,root_id,hpath,path FROM blocks WHERE box='${box}' AND type='d' LIMIT 20000`);
-const blocks = await sql(auth, `SELECT id,root_id,parent_id,type,subtype,content,markdown FROM blocks WHERE box='${box}' LIMIT 250000`);
+const docs = await sql(auth, "SELECT id,root_id,hpath,path,box FROM blocks WHERE type = 'd' LIMIT 20000");
+const blocks = await sql(auth, "SELECT id,root_id,parent_id,type,subtype,content,markdown,box FROM blocks LIMIT 250000");
+const notebookDocs = docs.filter((doc) => doc.box === notebook.id);
+const notebookBlocks = blocks.filter((block) => block.box === notebook.id);
 const byRoot = new Map();
-for (const block of blocks) {
+for (const block of notebookBlocks) {
   const list = byRoot.get(block.root_id) ?? [];
   list.push(block);
   byRoot.set(block.root_id, list);
 }
 const records = [];
-for (const doc of docs) {
+for (const doc of notebookDocs) {
   const rootBlocks = byRoot.get(doc.root_id) ?? [];
   const text = rootBlocks.map((block) => `${block.content ?? ''}\n${block.markdown ?? ''}`).join('\n');
   const sourceIds = extractSourceIds(text).filter((id) => SAMPLE_IDS.has(id));

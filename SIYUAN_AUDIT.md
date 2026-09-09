@@ -1,6 +1,6 @@
 # 思源只读实时审计脚本
 
-`scripts/siyuan-audit.mjs` 只读取本机 `http://127.0.0.1:6806` 的思源 API，并默认从 `C:/Users/tortl/AI/tools/siyuan/token.txt` 读取 token。token 不会打印，也不会写入报告。
+`scripts/siyuan-audit.mjs` 只读取本机 `http://127.0.0.1:6806` 的思源 API，并且只从环境变量 `SIYUAN_TOKEN` 读取凭据。token 不会打印，也不会写入报告。
 
 运行：
 
