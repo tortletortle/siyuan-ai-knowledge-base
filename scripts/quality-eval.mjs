@@ -1,31 +1,37 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { basename, dirname, join, resolve } from 'node:path';
 import { loadDataset } from '../src/ingest.mjs';
 import { retrieve } from '../src/retrieve.mjs';
 import { evaluateQueries } from '../src/quality.mjs';
-import { auditLesson } from '../src/learning-quality.mjs';
+import { validateEvalCases, sha256Json } from '../src/eval-schema.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
-const outDir = resolve(args.find((arg) => arg.startsWith('--out='))?.slice(6) ?? join(root, 'out'));
-const files = args.filter((arg) => !arg.startsWith('--'));
-const fixture = await loadDataset({ knowledgePath: join(root, 'fixtures/knowledge.json'), sourcesPath: join(root, 'fixtures/sources.json') });
-const evalCases = JSON.parse(await readFile(join(root, 'fixtures/eval-cases.json'), 'utf8'));
-const retrieval = evaluateQueries(fixture, evalCases, retrieve);
-const lessonAudits = [];
-for (let index = 0; index < files.length; index += 4) {
-  const group = files.slice(index, index + 4);
-  if (group.length !== 4) continue;
-  lessonAudits.push(await auditLesson(group[0], group[1], group[2], group[3]));
+const valueOf = (name) => args.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
+const paths = { knowledge: valueOf('knowledge'), sources: valueOf('sources'), cases: valueOf('cases'), out: valueOf('out') };
+const external = Boolean(paths.knowledge || paths.sources || paths.cases);
+if (external && !(paths.knowledge && paths.sources && paths.cases)) throw new Error('external evaluation requires --knowledge, --sources, and --cases together');
+const input = external ? paths : { knowledge: join(root, 'fixtures/knowledge.json'), sources: join(root, 'fixtures/sources.json'), cases: join(root, 'fixtures/eval-cases.json') };
+for (const [name, file] of Object.entries(input)) {
+  try { await stat(file); } catch { throw new Error(`${name} file does not exist: ${file}`); }
 }
-const findings = [
-  ...retrieval.rows.flatMap((row) => row.suggestions.map((suggestion) => ({ issue_type: 'retrieval', severity: 'warning', target_file: 'retrieve()', target_locator: row.query, current_excerpt: suggestion, proposed_action: suggestion, confidence: 0.75, requires_confirmation: true }))),
-  ...lessonAudits.flatMap((audit) => [...audit.findings, ...audit.transcript_quality.findings.map((finding) => ({ ...finding, issue_type: 'transcript.' + finding.rule_id }))])
-];
-const report = { generated_at: new Date().toISOString(), policy: 'read-only quality evaluation; no source or note files changed', retrieval, lessons: lessonAudits, findings, summary: { finding_count: findings.length, by_severity: Object.fromEntries(['error', 'warning', 'info'].map((severity) => [severity, findings.filter((item) => item.severity === severity).length])) } };
-await mkdir(outDir, { recursive: true });
-await writeFile(join(outDir, 'quality-report.json'), JSON.stringify(report, null, 2), 'utf8');
-const markdown = `# Knowledge Quality Report\n\n- Retrieval hit@1: ${retrieval.aggregate.hit_at_1}\n- Retrieval hit@3: ${retrieval.aggregate.hit_at_3}\n- MRR: ${retrieval.aggregate.mrr.toFixed(4)}\n- Findings: ${findings.length}\n- Error / Warning / Info: ${report.summary.by_severity.error} / ${report.summary.by_severity.warning} / ${report.summary.by_severity.info}\n\n## Suggestions\n${findings.map((item) => `- [${item.severity}] ${item.issue_type}: ${item.proposed_action} (${item.target_locator})`).join('\n')}`;
-await writeFile(join(outDir, 'quality-report.md'), markdown, 'utf8');
-console.log(JSON.stringify({ output: outDir, summary: report.summary, retrieval: retrieval.aggregate }, null, 2));
+if (external && resolve(input.knowledge).startsWith(`${root}${process.platform === 'win32' ? '\\' : '/'}`)) throw new Error('external dataset must be outside the public repository');
+const dataset = await loadDataset({ knowledgePath: input.knowledge, sourcesPath: input.sources });
+const cases = validateEvalCases(JSON.parse(await readFile(input.cases, 'utf8')), new Set(dataset.knowledge.map((item) => item.knowledge_id)));
+const retrieval = evaluateQueries(dataset, cases, retrieve);
+const outputDir = resolve(paths.out ?? (external ? join(dirname(input.cases), 'runs', new Date().toISOString().slice(0, 10)) : join(root, 'out')));
+await mkdir(outputDir, { recursive: true });
+const report = {
+  generated_at: new Date().toISOString(),
+  policy: 'read-only evaluation; report excludes source text and evidence quotes',
+  dataset: { external, knowledge_count: dataset.knowledge.length, source_count: dataset.sources.length, hash: sha256Json({ knowledge: dataset.knowledge, sources: dataset.sources }) },
+  cases: { count: cases.length, hash: sha256Json(cases) },
+  retrieval,
+  findings: retrieval.rows.flatMap((row) => row.suggestions.map((suggestion) => ({ id: row.id, issue_type: 'retrieval', suggestion })))
+};
+await writeFileSafe(join(outputDir, 'quality-report.json'), JSON.stringify(report, null, 2));
+const markdown = `# Retrieval Evaluation\n\n- External dataset: ${external}\n- Knowledge items: ${dataset.knowledge.length}\n- Cases: ${cases.length}\n- Hit@1: ${retrieval.aggregate.hit_at_1}\n- Hit@3: ${retrieval.aggregate.hit_at_3}\n- MRR: ${retrieval.aggregate.mrr.toFixed(4)}\n- No-answer false-hit rate: ${retrieval.aggregate.no_answer_false_hit_rate}\n- Evidence coverage: ${retrieval.aggregate.evidence_coverage}\n\n## Failed or review cases\n${retrieval.rows.filter((row) => row.suggestions.some((item) => !item.includes('符合预期'))).map((row) => `- ${row.id}: ${row.suggestions.join('；')}`).join('\n') || '- none'}`;
+await writeFileSafe(join(outputDir, 'quality-report.md'), markdown);
+console.log(JSON.stringify({ output: outputDir, external, dataset: report.dataset, cases: report.cases, aggregate: retrieval.aggregate }, null, 2));
+async function writeFileSafe(file, content) { const { writeFile } = await import('node:fs/promises'); await writeFile(file, content, 'utf8'); }

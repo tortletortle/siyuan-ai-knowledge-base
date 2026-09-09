@@ -9,6 +9,7 @@
     "audit:siyuan": "node scripts/siyuan-audit.mjs",
     "eval:transcripts": "node scripts/transcript-eval.mjs",
     "eval:quality": "node scripts/quality-eval.mjs",
-    "inspect:siyuan": "node scripts/inspect-siyuan-snapshot.mjs"
+    "inspect:siyuan": "node scripts/inspect-siyuan-snapshot.mjs",
+    "eval:external": "node scripts/quality-eval.mjs"
   }
 }
