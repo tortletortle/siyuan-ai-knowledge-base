@@ -21,7 +21,8 @@ if (paths.out) {
   try { await stat(parent); } catch { throw new Error(`out parent directory does not exist: ${parent}`); }
 }
 if (external && resolve(input.knowledge).startsWith(`${root}${process.platform === 'win32' ? '\\' : '/'}`)) throw new Error('external dataset must be outside the public repository');
-const dataset = await loadDataset({ knowledgePath: input.knowledge, sourcesPath: input.sources });
+const aliasesPath = external ? valueOf('aliases') : join(root, 'fixtures/aliases.json');
+const dataset = await loadDataset({ knowledgePath: input.knowledge, sourcesPath: input.sources, aliasesPath });
 const cases = validateEvalCases(JSON.parse(await readFile(input.cases, 'utf8')), new Set(dataset.knowledge.map((item) => item.knowledge_id)));
 const retrieval = evaluateQueries(dataset, cases, retrieve);
 const outputDir = resolve(paths.out ?? (external ? join(dirname(input.cases), 'runs', new Date().toISOString().slice(0, 10)) : join(root, 'out')));

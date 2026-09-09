@@ -6,7 +6,7 @@ import { loadDataset } from '../src/ingest.mjs';
 import { retrieve } from '../src/retrieve.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const dataset = await loadDataset({ knowledgePath: join(root, 'fixtures/knowledge.json'), sourcesPath: join(root, 'fixtures/sources.json') });
+const dataset = await loadDataset({ knowledgePath: join(root, 'fixtures/knowledge.json'), sourcesPath: join(root, 'fixtures/sources.json'), aliasesPath: join(root, 'fixtures/aliases.json') });
 
 test('精确问题命中 active 知识', () => {
   const result = retrieve(dataset, '时序逻辑依赖什么');
@@ -30,7 +30,7 @@ test('摘要模式不默认加载正文和证据', () => {
 });
 
 test('证据模式才加载可定位来源', () => {
-  const result = retrieve(dataset, 'FSM 的来源是什么', { mode: 'evidence' });
+  const result = retrieve(dataset, 'FSM 的来源是什么', { mode: 'evidence', minScore: 1 });
   assert.equal(result.intent, 'evidence');
   assert.ok(result.evidence.length > 0);
   assert.ok(result.evidence.every((entry) => entry.locator));

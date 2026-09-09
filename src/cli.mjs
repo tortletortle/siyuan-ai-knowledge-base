@@ -4,7 +4,7 @@ import { loadDataset } from './ingest.mjs';
 import { retrieve } from './retrieve.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const dataset = await loadDataset({ knowledgePath: join(root, 'fixtures/knowledge.json'), sourcesPath: join(root, 'fixtures/sources.json') });
+const dataset = await loadDataset({ knowledgePath: join(root, 'fixtures/knowledge.json'), sourcesPath: join(root, 'fixtures/sources.json'), aliasesPath: join(root, 'fixtures/aliases.json') });
 const args = process.argv.slice(2);
 const demo = args.includes('--demo');
 const modeArg = args.find((arg) => arg.startsWith('--mode='));

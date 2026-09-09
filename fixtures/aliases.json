@@ -1,0 +1,8 @@
+[
+  {"canonical":"有限状态机","aliases":["FSM","finite state machine"],"scope":"digital-ic","version":"1"},
+  {"canonical":"骨骼动画","aliases":["SPINE","spine","SkeletonData"],"scope":"K17","version":"1"},
+  {"canonical":"行高","aliases":["lineHeight","行间距"],"scope":"K17","version":"1"},
+  {"canonical":"触摸坐标转节点本地坐标","aliases":["convertTouchToNodeSpaceAR","触摸坐标转换","触摸转节点坐标"],"scope":"K17","version":"1"},
+  {"canonical":"PNG图集","aliases":["PNG图集文件","图集文件"],"scope":"K17","version":"1"},
+  {"canonical":"ATLAS文件","aliases":["ATLAS","atlas"],"scope":"K17","version":"1"}
+]

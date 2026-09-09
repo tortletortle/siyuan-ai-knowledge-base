@@ -17,8 +17,12 @@ export function evaluateQueries(dataset, cases, retrieveFn) {
     const expected = new Set(testCase.expected_ids ?? []);
     const directIds = result.direct.map(({ item }) => item.knowledge_id);
     const relevantCount = directIds.filter((id) => expected.has(id)).length;
+    const answerPolicy = testCase.answer_policy ?? (expected.size > 1 ? 'any' : 'primary');
+    const anyHit = relevantCount > 0;
+    const allHit = expected.size > 0 && [...expected].every((id) => directIds.includes(id));
     const rank = firstRelevantRank(result, expected);
     const irrelevantIds = directIds.filter((id) => !expected.has(id));
+    const answerHit = answerPolicy === 'all' ? allHit : answerPolicy === 'any' ? anyHit : rank === 1;
     const pollutedIds = result.direct.filter(({ item }) => ['deprecated', 'archived'].includes(item.status)).map(({ item }) => item.knowledge_id);
     const requiresEvidence = Boolean(testCase.requires_evidence);
     const evidenceCovered = !requiresEvidence || result.evidence.length > 0;
@@ -29,7 +33,9 @@ export function evaluateQueries(dataset, cases, retrieveFn) {
       expected_ids: [...expected],
       direct_ids: directIds,
       first_relevant_rank: rank,
-      hit_at_1: rank === 1,
+      answer_hit: answerHit,
+      any_hit: anyHit,
+      all_hit: allHit,
       hit_at_3: rank !== null && rank <= 3,
       hit_at_5: rank !== null && rank <= 5,
       precision_at_k: directIds.length ? relevantCount / directIds.length : 0,
