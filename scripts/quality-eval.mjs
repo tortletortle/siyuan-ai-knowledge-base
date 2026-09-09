@@ -12,9 +12,13 @@ const valueOf = (name) => args.find((arg) => arg.startsWith(`--${name}=`))?.slic
 const paths = { knowledge: valueOf('knowledge'), sources: valueOf('sources'), cases: valueOf('cases'), out: valueOf('out') };
 const external = Boolean(paths.knowledge || paths.sources || paths.cases);
 if (external && !(paths.knowledge && paths.sources && paths.cases)) throw new Error('external evaluation requires --knowledge, --sources, and --cases together');
-const input = external ? paths : { knowledge: join(root, 'fixtures/knowledge.json'), sources: join(root, 'fixtures/sources.json'), cases: join(root, 'fixtures/eval-cases.json') };
+const input = external ? { knowledge: paths.knowledge, sources: paths.sources, cases: paths.cases } : { knowledge: join(root, 'fixtures/knowledge.json'), sources: join(root, 'fixtures/sources.json'), cases: join(root, 'fixtures/eval-cases.json') };
 for (const [name, file] of Object.entries(input)) {
   try { await stat(file); } catch { throw new Error(`${name} file does not exist: ${file}`); }
+}
+if (paths.out) {
+  const parent = dirname(resolve(paths.out));
+  try { await stat(parent); } catch { throw new Error(`out parent directory does not exist: ${parent}`); }
 }
 if (external && resolve(input.knowledge).startsWith(`${root}${process.platform === 'win32' ? '\\' : '/'}`)) throw new Error('external dataset must be outside the public repository');
 const dataset = await loadDataset({ knowledgePath: input.knowledge, sourcesPath: input.sources });
