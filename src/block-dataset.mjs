@@ -18,7 +18,8 @@ export function blockIndexToDataset(index, options = {}) {
       root_id: block.root_id,
       block_id: block.block_id,
       parent_id: block.parent_id,
-      links: block.links
+      aliases: options.aliases ?? [],
+      links: block.links ?? []
     };
   });
   return { knowledge, sources: [...sourceMap.values()], aliases: options.aliases ?? [] };
