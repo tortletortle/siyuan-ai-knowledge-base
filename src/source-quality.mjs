@@ -1,7 +1,7 @@
 const DEFAULT_RULES = [
   { id: 'meta.template', severity: 'warning', pattern: /没问题|稍等片刻|以下是.*整理|你稍等|我这就开始处理/iu, action: '复核并删除转写中的模板化元话语' },
-  { id: 'meta.audio-description', severity: 'warning', pattern: /人声[A-Z]|音色|普通话标准|键盘敲击|录音环境|三十来岁|音频文件的描述/iu, action: '对照音频，移除音频人格或环境描述' },
-  { id: 'meta.stage-direction', severity: 'warning', pattern: /（人声|\(人声|专心点|歇会儿/iu, action: '复核并移除舞台提示或非课程对白' },
+  { id: 'meta.audio-description', severity: 'warning', pattern: /(?:男声|女声|人声[A-Z]|音色|普通话标准|键盘敲击|录音环境|三十来岁|音频文件的描述)/iu, action: '对照音频，移除音频人格或环境描述' },
+  { id: 'meta.stage-direction', severity: 'warning', pattern: /(?:（人声|\(人声|专心点|歇会儿)/iu, action: '复核并移除舞台提示或非课程对白' },
   { id: 'text.garbled', severity: 'warning', pattern: /�|�{2,}|[\u0000-\u0008\u000b\u000c\u000e-\u001f]/u, action: '复核乱码或不可见控制字符' }
 ];
 
