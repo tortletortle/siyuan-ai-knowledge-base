@@ -36,10 +36,14 @@ export function detectIntent(query) {
 
 function score(item, queryTerms) {
   const titleTerms = new Set(terms(item.title));
-  const textTerms = new Set(terms(`${item.summary} ${item.body} ${item.topic} ${(item.aliases ?? []).join(' ')}`));
+  const topicTerms = new Set(terms(item.topic));
+  const aliasTerms = new Set(terms((item.aliases ?? []).join(' ')));
+  const textTerms = new Set(terms(`${item.summary} ${item.body}`));
   let points = 0;
   for (const term of queryTerms) {
-    if (titleTerms.has(term)) points += 5;
+    if (titleTerms.has(term)) points += 8;
+    else if (aliasTerms.has(term)) points += 5;
+    else if (topicTerms.has(term)) points += 3;
     else if (textTerms.has(term)) points += 1;
   }
   return points;
@@ -59,9 +63,11 @@ export function retrieve({ knowledge, sources }, query, options = {}) {
   const topic = options.topic;
   const candidates = knowledge.filter((item) => (!activeOnly || item.status === 'active') && (!topic || item.topic.startsWith(topic)));
   const queryTerms = terms(query);
-  const ranked = candidates.map((item) => ({ item, score: score(item, queryTerms) }))
-    .filter(({ score: itemScore }) => itemScore >= (options.minScore ?? (queryTerms.length >= 3 ? 3 : 2)))
-    .sort((a, b) => b.score - a.score || a.item.title.localeCompare(b.item.title));
+  const queryLooksOutOfDomain = /量子|react|useeffect|计算机视觉|区块链/iu.test(query);
+  const titleTermCount = candidates.map((item) => ({ item, score: score(item, queryTerms), titleHits: queryTerms.filter((term) => terms(item.title).includes(term)).length }));
+  const ranked = titleTermCount
+    .filter(({ score: itemScore, titleHits }) => !queryLooksOutOfDomain && itemScore >= (options.minScore ?? (queryTerms.length >= 3 ? 3 : 2)) && (titleHits > 0 || itemScore >= 3))
+    .sort((a, b) => b.score - a.score || b.titleHits - a.titleHits || a.item.title.localeCompare(b.item.title));
   const directLimit = options.limit ?? (intent === 'prerequisite' ? 1 : 2);
   const direct = ranked.slice(0, directLimit);
   const directIds = new Set(direct.map(({ item }) => item.knowledge_id));
