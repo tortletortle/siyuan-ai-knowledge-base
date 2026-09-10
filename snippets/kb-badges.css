@@ -1,0 +1,39 @@
+/* 知识库挂牌：在已入库 / 待复核的块上挂徽标。
+ * 安装：思源 → 设置 → 外观 → 代码片段 → CSS，粘贴本文件内容。
+ * 原理：只读 custom-kb-status 纸条做样式渲染，不改动任何正文。
+ */
+
+/* 已入库：右上角小绿牌 */
+.protyle-wysiwyg [custom-kb-status="active"]::after {
+  content: "✓ 已入库";
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  color: #1a7f37;
+  background: #dafbe1;
+  border: 1px solid #aceebb;
+  border-radius: 9px;
+  vertical-align: middle;
+}
+
+/* 待复核（原文改过、知识过期）：小黄牌 */
+.protyle-wysiwyg [custom-kb-status="stale"]::after {
+  content: "⚠ 原文已变，待复核";
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  color: #9a6700;
+  background: #fff8c5;
+  border: 1px solid #eed888;
+  border-radius: 9px;
+  vertical-align: middle;
+}
+
+/* 排除区标题：淡化显示，提醒“这里不入库” */
+.protyle-wysiwyg [custom-kb-exclude="true"] {
+  opacity: 0.55;
+}
