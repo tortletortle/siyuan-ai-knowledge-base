@@ -24,7 +24,7 @@ npm run query -- "学习状态机前需要什么"
 
 ## 数据边界
 
-原始 PDF、视频转写、网页全文和 API 快照应先进入来源层，经筛选、去重和人工确认后，才形成 `knowledge.json` 中的 active 知识。真实接入时，思源只读适配器应替换 fixture，不改变 `retrieve()` 的输出契约。笔记显示与知识提取的协调规则见 `KB_CONTRACT.md`，新课骨架见 `templates/lesson-template.md`。
+原始 PDF、视频转写、网页全文和 API 快照应先进入来源层，经筛选、去重和人工确认后，才形成 `knowledge.json` 中的 active 知识。真实接入时，思源只读适配器应替换 fixture，不改变 `retrieve()` 的输出契约。笔记显示与知识提取的协调规则见 `KB_CONTRACT.md`，新课骨架见 `templates/lesson-template.md`。关系图谱见 `GRAPH.md`，用 `npm run graph -- <index.json> <out-dir>` 导出 Mermaid 图和思源 MOC 文档。
 
 ## 试点验收
 

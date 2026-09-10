@@ -8,6 +8,23 @@ const NON_CONTENT_TYPES = new Set(['d', 'l', 'root']);
  * 返回 { 'custom-kb-exclude': 'true', style: 'color: red;', ... }。
  * IAL 是“显示与知识”之间的机器通道：人眼无感，提取器精确可读。
  */
+/**
+ * 提取思源块引用（图谱的边），支持三种真实写法：
+ * 1. markdown 块引：((20240101120000-abc1234 "锚文本")) 或 ((20240101120000-abc1234))
+ * 2. 块超链：[文本](siyuan://blocks/20240101120000-abc1234)
+ * 3. content HTML：<span data-type="block-ref" data-id="20240101120000-abc1234">
+ * 返回去重后的目标 block id 数组。[[wikilink]] 仍由 extractLinks 处理。
+ */
+export function extractRefs(text) {
+  const value = String(text ?? '');
+  const found = new Set();
+  for (const match of value.matchAll(/\(\((\d[0-9A-Za-z-]{9,})[^()]*?\)\)/g)) found.add(match[1]);
+  for (const match of value.matchAll(/siyuan:\/\/blocks\/([0-9A-Za-z-]+)/g)) found.add(match[1]);
+  for (const match of value.matchAll(/data-type="block-ref"[^>]*?data-id="([^"]+)"/g)) found.add(match[1]);
+  for (const match of value.matchAll(/data-id="([^"]+)"[^>]*?data-type="block-ref"/g)) found.add(match[1]);
+  return [...found];
+}
+
 export function parseIAL(ial) {
   if (!ial || typeof ial !== 'string') return {};
   const attrs = {};
@@ -85,6 +102,7 @@ export function normalizeBlocks({ documents = [], blocks = [] }) {
         content_hash: createHash('sha256').update(text).digest('hex'),
         tags: block.tags ?? [],
         links: extractLinks(text),
+        refs: extractRefs(text),
         ial: block.ial ?? null,
         // 机读通道：主题覆盖与入库状态，不改变正文显示。
         kb_topic: kbTopic || null,
