@@ -13,6 +13,7 @@
     "eval:external": "node scripts/quality-eval.mjs",
     "normalize:siyuan": "node scripts/normalize-siyuan-snapshot.mjs",
     "export:siyuan": "node scripts/export-siyuan-blocks.mjs",
-    "build:knowledge-base": "node scripts/build-private-knowledge-base.mjs"
+    "build:knowledge-base": "node scripts/build-private-knowledge-base.mjs",
+    "apply:review": "node scripts/apply-review-state.mjs"
   }
 }
