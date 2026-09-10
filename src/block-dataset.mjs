@@ -8,7 +8,7 @@ export function blockIndexToDataset(index, options = {}) {
       title: block.title ? `${block.title}｜${block.text.slice(0, 80)}` : block.text.slice(0, 100),
       summary: block.text.slice(0, 240),
       body: block.text,
-      topic: block.path ?? '思源',
+      topic: block.kb_topic ?? block.path ?? '思源',
       course_id: options.courseId,
       status: options.status ?? 'active',
       source_ids: [sourceId],
