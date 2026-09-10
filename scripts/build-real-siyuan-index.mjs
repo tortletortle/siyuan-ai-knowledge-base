@@ -2,12 +2,12 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { buildIndex } from '../src/block-index.mjs';
 import { blockIndexToDataset } from '../src/block-dataset.mjs';
 
-const [input, indexOut, datasetOut] = process.argv.slice(2);
-if (!input || !indexOut || !datasetOut) throw new Error('usage: node scripts/build-real-siyuan-index.mjs <raw.json> <index.json> <dataset.json>');
+const [input, indexOut, datasetOut, sourceList] = process.argv.slice(2);
+if (!input || !indexOut || !datasetOut) throw new Error('usage: node scripts/build-real-siyuan-index.mjs <raw.json> <index.json> <dataset.json> [comma,separated,sourceIds]');
 const raw = JSON.parse(await readFile(input, 'utf8'));
 const byRoot = new Map();
 for (const block of raw.blocks ?? []) { const list = byRoot.get(block.root_id) ?? []; list.push(block); byRoot.set(block.root_id, list); }
-const targetIds = ['src-12b60e80b3f4', 'src-08fb3551228d', 'src-0ede861fcfaf'];
+const targetIds = sourceList?.split(',').map((id) => id.trim()).filter(Boolean) || ['src-12b60e80b3f4', 'src-08fb3551228d', 'src-0ede861fcfaf'];
 const selected = [];
 for (const sourceId of targetIds) {
   const candidates = [];

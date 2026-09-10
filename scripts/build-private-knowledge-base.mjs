@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { parseKnowledgePoint, isHeading, categoryFor, extractCorePoints } from '../src/knowledge-extract.mjs';
 
 const [input, outputDir] = process.argv.slice(2);
 if (!input || !outputDir) throw new Error('usage: node scripts/build-private-knowledge-base.mjs <real-index.json> <output-dir>');
@@ -12,35 +13,9 @@ for (const block of index.blocks ?? []) {
   roots.set(block.root_id, list);
 }
 
-function parseKnowledgePoint(text) {
-  const match = text.match(/^\s*\d+\.\s*([^：:]+)[：:]\s*(.+)$/us);
-  if (!match) return null;
-  return { title: match[1].trim(), definition: match[2].trim() };
-}
-
-function categoryFor(title, definition) {
-  const text = `${title} ${definition}`;
-  if (/方法|调用|getComponent|convert|获取|设置|配置|清理|播放/u.test(text)) return 'usage';
-  if (/属性|参数|文件|组成|构成|规则/u.test(text)) return 'property';
-  if (/区别|优势|原理|作用|应用|场景|特点/u.test(text)) return 'concept';
-  return 'concept';
-}
-
 function extractDocument(blocks) {
   const ordered = [...blocks].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
-  const sourceId = ordered.find((block) => block.source_id)?.source_id ?? null;
-  const title = ordered.find((block) => block.type === 'h' && /^##\s+[^#]/u.test(block.text))?.text.replace(/^#+\s*/u, '').trim() ?? ordered[0]?.title ?? blocks[0]?.root_id;
-  let inCore = false;
-  const points = [];
-  for (const block of ordered) {
-    if (block.type === 'h' && /^##\s*核心知识点\s*$/u.test(block.text)) { inCore = true; continue; }
-    if (inCore && block.type === 'h' && /^##\s*(术语表|卡片|测验|课程导航)\s*$/u.test(block.text)) break;
-    if (!inCore || !['p', 'i'].includes(block.type)) continue;
-    const parsed = parseKnowledgePoint(block.text);
-    if (!parsed) continue;
-    points.push({ block, ...parsed });
-  }
-  return { sourceId, title, points };
+  return extractCorePoints(ordered);
 }
 
 const knowledge = [];
