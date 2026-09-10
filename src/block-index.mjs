@@ -86,6 +86,9 @@ export function normalizeBlocks({ documents = [], blocks = [] }) {
       const text = blockText(block);
       const attrs = attrsOf(block);
       const kbTopic = attrs['custom-kb-topic']?.trim();
+      // 原生别名（块标菜单 → 命名/别名）：逗号/顿号分隔，直接喂给检索加权。
+      // 术语别名从此写在思源里，不再只靠 fixtures/aliases.json。
+      const nativeAliases = (attrs.alias ?? '').split(/[,，、]/).map((value) => value.trim()).filter(Boolean);
       return {
         block_id: block.id,
         doc_id: doc.id ?? block.root_id,
@@ -106,7 +109,8 @@ export function normalizeBlocks({ documents = [], blocks = [] }) {
         ial: block.ial ?? null,
         // 机读通道：主题覆盖与入库状态，不改变正文显示。
         kb_topic: kbTopic || null,
-        kb_status: attrs['custom-kb-status']?.trim() || null
+        kb_status: attrs['custom-kb-status']?.trim() || null,
+        kb_aliases: nativeAliases,
       };
     });
 }

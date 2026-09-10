@@ -26,6 +26,23 @@ npm run graph -- <index.json> <out-dir>   # 得到 moc.md
 局限：原生图谱显示的是“块引关系”，MOC 法形成以地图为中心的星型；
 知识点之间的直接语义边请看路径 B。
 
+### 路径 A+：SQL 嵌入块（活的 MOC，推荐）
+
+静态 `moc.md` 每次都要重新生成。更原生的做法是在“知识地图”文档里放一个
+SQL 嵌入块，活查所有已入库块，入库后自动刷新：
+
+```sql
+{{SELECT * FROM blocks WHERE ial LIKE '%custom-kb-status="active"%' AND type NOT IN ('d') ORDER BY updated DESC LIMIT 200}}
+```
+
+课程模板里的“本课已入库”区就是这个原理（加了 `root_id` 过滤只看本课）。
+
+### 让边自然生长：提及 → 块引
+
+思源反链面板的“提及”会自动找出提到当前块的文字。建议工作流：
+写完一篇课后，打开提及面板，把真正的概念关联一键转为块引。
+这是零成本的边来源：人只做 yes/no，图谱自己长大。
+
 ### 路径 B：外部可视化（Mermaid）
 
 同一命令还会生成 `graph.md`（Mermaid `flowchart`）和 `graph.json`

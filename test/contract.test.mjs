@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildIndex, parseIAL } from '../src/block-index.mjs';
 import { blockIndexToDataset } from '../src/block-dataset.mjs';
+import { retrieve } from '../src/retrieve.mjs';
 
 const documents = [{ id: 'doc-1', root_id: 'root-1', hpath: '/课程/K17-014', title: 'Label 组件' }];
 const docBlock = { id: 'root-1', root_id: 'root-1', type: 'd', content: '文档' };
@@ -99,6 +100,23 @@ test('custom-kb-topic 覆盖主题且不改动正文，并透传到数据集', (
   assert.equal(index.blocks[0].text, 'lineHeight 控制行高');
   const dataset = blockIndexToDataset(index);
   assert.equal(dataset.knowledge[0].topic, 'Label/属性');
+});
+
+test('原生别名进 IAL，直达检索加权（不再只靠 aliases.json）', () => {
+  const index = buildIndex({
+    documents,
+    blocks: [
+      docBlock,
+      { id: 'k1', root_id: 'root-1', type: 'p', content: '有限状态机由状态、转移和输出组成', ial: '{: alias="FSM,finite state machine"}' }
+    ]
+  });
+  assert.deepEqual(index.blocks[0].kb_aliases, ['FSM', 'finite state machine']);
+  const dataset = blockIndexToDataset(index);
+  assert.deepEqual(dataset.knowledge[0].aliases, ['FSM', 'finite state machine']);
+  // 英文缩写能命中中文知识：靠的就是原生别名，不是全局别名表。
+  const result = retrieve({ knowledge: dataset.knowledge, sources: dataset.sources, aliases: [] }, 'FSM 是什么', { minScore: 1 });
+  assert.equal(result.direct[0].item.knowledge_id, 'block-k1');
+  assert.ok(result.direct[0].matches.some((match) => match.field === 'alias'));
 });
 
 test('没有纸条时行为与旧版完全一致（向后兼容）', () => {
