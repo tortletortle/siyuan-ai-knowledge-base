@@ -47,7 +47,7 @@ const notebooks = await api('/api/notebook/lsNotebooks', {}, auth);
 const notebook = (notebooks.notebooks ?? []).find((item) => item.name === NOTEBOOK && !item.closed);
 if (!notebook) throw new Error(`notebook not found: ${NOTEBOOK}`);
 const docs = await sql(auth, "SELECT id,root_id,hpath,path,box FROM blocks WHERE type = 'd' LIMIT 20000");
-const blocks = await sql(auth, "SELECT id,root_id,parent_id,type,subtype,content,markdown,box FROM blocks LIMIT 250000");
+const blocks = await sql(auth, "SELECT id,root_id,parent_id,type,subtype,content,markdown,ial,box FROM blocks LIMIT 250000");
 const notebookDocs = docs.filter((doc) => doc.box === notebook.id);
 const notebookBlocks = blocks.filter((block) => block.box === notebook.id);
 const byRoot = new Map();

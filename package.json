@@ -15,6 +15,8 @@
     "export:siyuan": "node scripts/export-siyuan-blocks.mjs",
     "build:knowledge-base": "node scripts/build-private-knowledge-base.mjs",
     "apply:review": "node scripts/apply-review-state.mjs",
-    "graph": "node scripts/export-graph.mjs"
+    "graph": "node scripts/export-graph.mjs",
+    "baseline": "node scripts/baseline.mjs",
+    "report": "node scripts/report.mjs"
   }
 }

@@ -36,6 +36,9 @@ for (const [rootId, blocks] of roots) {
     knowledge.push({
       knowledge_id: id,
       title: point.title,
+      summary: point.definition,
+      body: point.definition,
+      topic: document.title,
       definition: point.definition,
       key_points: [point.definition],
       usage: category === 'usage' ? [point.definition] : [],

@@ -52,12 +52,17 @@ export function evaluateQueries(dataset, cases, retrieveFn) {
   const noAnswerCases = rows.filter((row) => !(cases.find((item) => (item.id ?? item.query) === row.id)?.expected_ids ?? []).length);
   const noAnswerFalseHits = noAnswerCases.filter((row) => row.direct_ids.length > 0);
   const allContextChars = rows.map((row) => row.metrics.contextChars);
+  // 命中类指标只在“有答案用例”上算：无答案用例由误命中率单独考核，
+  // 否则无答案用例越多，Hit@K/MRR 被稀释得越厉害。
+  const answerable = rows.filter((row) => row.expected_ids.length);
+  const answerableCount = answerable.length;
   const aggregate = {
     total: rows.length,
-    hit_at_1: ratio(rows.filter((row) => row.hit_at_1).length, rows.length),
-    hit_at_3: ratio(rows.filter((row) => row.hit_at_3).length, rows.length),
-    hit_at_5: ratio(rows.filter((row) => row.hit_at_5).length, rows.length),
-    mrr: ranks.length ? ranks.reduce((sum, rank) => sum + 1 / rank, 0) / rows.length : 0,
+    answerable: answerableCount,
+    hit_at_1: ratio(answerable.filter((row) => row.hit_at_1).length, answerableCount),
+    hit_at_3: ratio(answerable.filter((row) => row.hit_at_3).length, answerableCount),
+    hit_at_5: ratio(answerable.filter((row) => row.hit_at_5).length, answerableCount),
+    mrr: ranks.length && answerableCount ? ranks.reduce((sum, rank) => sum + 1 / rank, 0) / answerableCount : 0,
     mean_precision: mean(rows.map((row) => row.precision_at_k)),
     evidence_coverage: ratio(rows.filter((row) => row.evidence_covered).length, rows.length),
     deprecated_or_archived_pollution_rate: ratio(rows.filter((row) => row.deprecated_or_archived_ids.length).length, rows.length),

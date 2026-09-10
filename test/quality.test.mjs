@@ -15,6 +15,17 @@ test('quality preserves standard hit_at_1 independently of answer policy', () =>
   assert.equal(result.aggregate.hit_at_1, 0);
 });
 
+test('hit and mrr aggregates only count answerable cases', () => {
+  const result = evaluateQueries(dataset, [
+    { id: 'yes', query: 'first', expected_ids: ['a'] },
+    { id: 'no', query: 'nothing-matches', expected_ids: [] }
+  ], fake);
+  assert.equal(result.aggregate.answerable, 1);
+  assert.equal(result.aggregate.hit_at_1, 1);
+  assert.equal(result.aggregate.mrr, 1);
+  assert.equal(result.aggregate.no_answer_false_hit_rate, 0);
+});
+
 test('any and all policies distinguish partial and complete answers', () => {
   const result = evaluateQueries(dataset, [
     { id: 'any', query: 'one', expected_ids: ['a', 'b'], answer_policy: 'any' },

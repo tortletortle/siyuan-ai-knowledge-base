@@ -1,5 +1,10 @@
 import { buildIndex } from './block-index.mjs';
 
+/**
+ * 非主路径（实验性）：一文档聚合成一条粗粒度知识。
+ * 主路径是知识点级（scripts/build-private-knowledge-base.mjs + src/knowledge-extract.mjs）。
+ * 本文件仅保留做对比实验，不要在新链路中引用。详见 DESIGN.md §9。
+ */
 export function aggregateCoreBlocks(index) {
   const byRoot = new Map();
   for (const block of index.blocks) {

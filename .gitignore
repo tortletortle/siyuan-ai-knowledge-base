@@ -1,2 +1,14 @@
 .mimosa/
 out/
+# 私有数据永不进仓库：真实快照/课程/评测输出一律放仓库外，
+# 以下规则是第二道防线（防手滑 git add）。
+private/
+*-private/
+*.private.json
+candidate-knowledge*.json
+candidate-knowledge*.md
+active-knowledge*.json
+review-state*.json
+quality-report*.json
+quality-report*.md
+graph.json

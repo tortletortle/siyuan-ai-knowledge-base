@@ -91,6 +91,10 @@ CSS 片段（`snippets/kb-badges.css`）→ 已入库/待复核徽标；
 
 ## 9. 工程现状（已实现，勿重复造）
 
+- 主路径声明：知识点级是唯一主路径（`knowledge-extract` + `build-private-knowledge-base`）；
+  `core-aggregate.mjs`（一文档一条）已标记实验性，只做对比，不进新链路。
+  候选知识必须带 `summary/body/topic`（检索层硬性要求，见 `schema.mjs`）。
+
 - `src/block-index.mjs`：`parseIAL` / `extractRefs` / IAL 感知过滤 / `kb_topic/kb_status/kb_aliases`。
 - `src/graph.mjs`：`buildGraph/toMermaid/toMOC/cleanLabel`；`scripts/export-graph.mjs`（`npm run graph`）。
 - `src/retrieve.mjs` + `quality/source-quality/learning-quality` + 评测脚本。
@@ -137,6 +141,17 @@ CSS 片段（`snippets/kb-badges.css`）→ 已入库/待复核徽标；
 - 把 `review-state.json` 的 `related` 人工标注，转成知识条目的 `relations`
  （`prerequisite_of/contrasts_with`），并让 `buildGraph` 合并引用边与语义边输出。
 - 验收：端到端测试——含 2 条语义关系的 fixture → graph.json 里出现对应 typed 边。
+
+### T7 分组指标：意图/标签/课程分组（约半天，T4 的前置）
+
+- 现状：`quality.mjs` 只有全局聚合，`TEST_PLAN.md` 承诺的“按意图、课程、标签分组”缺失；
+  没有分组，T4 改完分词不知道哪里变好哪里变坏。
+- 在 `evaluateQueries` 的 `aggregate` 下加 `by_intent/by_tag/by_split` 分组
+  （每组复用 Hit@1/Hit@3/MRR/样本数），`eval-cases.json` 用现成的 `tags/split` 字段，
+  意图取 `result.intent`。
+- 验收：fixture 报告里出现分组表；新增测试断言某分组样本数与指标。
+- 注意：Hit@K/MRR 已改为只在有答案用例上统计（`aggregate.answerable`），
+  分组内同样遵守；无答案组只看误命中率。
 
 ### T6 真实快照试跑（人工 + AI 配合）
 
