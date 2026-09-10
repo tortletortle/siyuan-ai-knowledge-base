@@ -12,6 +12,7 @@
     "inspect:siyuan": "node scripts/inspect-siyuan-snapshot.mjs",
     "eval:external": "node scripts/quality-eval.mjs",
     "normalize:siyuan": "node scripts/normalize-siyuan-snapshot.mjs",
-    "export:siyuan": "node scripts/export-siyuan-blocks.mjs"
+    "export:siyuan": "node scripts/export-siyuan-blocks.mjs",
+    "build:knowledge-base": "node scripts/build-private-knowledge-base.mjs"
   }
 }
