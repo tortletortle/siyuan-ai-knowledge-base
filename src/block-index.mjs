@@ -2,13 +2,24 @@ import { createHash } from 'node:crypto';
 
 const NON_CONTENT_TYPES = new Set(['d', 'l', 'root']);
 
+function blockText(block) {
+  const content = String(block.content ?? '').trim();
+  return content || String(block.markdown ?? '').trim();
+}
+
+function isExcludedTitle(block) {
+  const text = blockText(block);
+  return /^(?:#{1,6}\s*)?(?:卡片|测验)\s*$/u.test(text);
+}
+
 function hasExcludedAncestor(block, byId) {
+  const visited = new Set();
   let current = block;
-  for (let i = 0; i < 20 && current?.parent_id; i += 1) {
+  while (current?.parent_id && !visited.has(current.parent_id)) {
+    visited.add(current.parent_id);
     current = byId.get(current.parent_id);
     if (!current) break;
-    const text = String(current.content ?? current.markdown ?? '').trim();
-    if (current.type === 'h' && (/^#{1,6}\s*(卡片|测验)\s*$/u.test(text) || /^(卡片|测验)$/u.test(text))) return true;
+    if (isExcludedTitle(current)) return true;
   }
   return false;
 }
@@ -17,10 +28,10 @@ export function normalizeBlocks({ documents = [], blocks = [] }) {
   const docs = new Map(documents.map((doc) => [doc.root_id ?? doc.id, doc]));
   const byId = new Map(blocks.map((block) => [block.id, block]));
   return blocks
-    .filter((block) => !NON_CONTENT_TYPES.has(block.type) && !isExcludedSection(block) && !hasExcludedAncestor(block, byId) && String(block.content ?? block.markdown ?? '').trim())
+    .filter((block) => !NON_CONTENT_TYPES.has(block.type) && !isExcludedTitle(block) && !hasExcludedAncestor(block, byId) && blockText(block))
     .map((block, index) => {
       const doc = docs.get(block.root_id) ?? {};
-      const text = String(block.markdown ?? block.content ?? '').trim();
+      const text = blockText(block);
       return {
         block_id: block.id,
         doc_id: doc.id ?? block.root_id,
@@ -42,14 +53,10 @@ export function normalizeBlocks({ documents = [], blocks = [] }) {
     });
 }
 
-function isExcludedSection(block) {
-  const text = String(block.content ?? block.markdown ?? '').trim();
-  return block.type === 'h' && /^#{1,6}\s*(卡片|测验)\s*$/u.test(text);
-}
-
 export function buildIndex(snapshot) {
   const blocks = normalizeBlocks(snapshot);
   return { schema_version: 1, generated_at: new Date().toISOString(), block_count: blocks.length, blocks };
 }
+
 function normalize(text) { return text.toLowerCase().replace(/\s+/g, ' ').trim(); }
 function extractLinks(text) { return [...text.matchAll(/\[\[([^\]]+)\]\]/g)].map((match) => match[1]); }

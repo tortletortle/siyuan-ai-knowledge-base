@@ -59,7 +59,7 @@ export function retrieve({ knowledge, sources, aliases = [] }, query, options = 
   const dedupedRanked = [];
   const seenTexts = new Set();
   for (const candidate of ranked) {
-    const key = candidate.item.text_normalized ?? candidate.item.body?.toLowerCase().replace(/\s+/g, ' ');
+    const key = candidate.item.text_normalized ?? candidate.item.body?.toLowerCase().replace(/\s+/g, ' ') ?? `knowledge:${candidate.item.knowledge_id}`;
     if (seenTexts.has(key)) continue;
     seenTexts.add(key);
     dedupedRanked.push(candidate);

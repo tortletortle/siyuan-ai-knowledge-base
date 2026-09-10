@@ -59,3 +59,31 @@ test('无答案时返回空命中而不是伪造结果', () => {
   assert.equal(result.neighbors.length, 0);
 });
 
+test('相同正文在 limit 前去重，不会占用多个直接结果名额', () => {
+  const duplicateDataset = {
+    knowledge: [
+      { knowledge_id: 'dup-1', title: '重复条目一', summary: '状态机定义', body: '状态机由状态和转移组成。', topic: '测试', status: 'active', source_ids: [], relations: [], evidence: [] },
+      { knowledge_id: 'dup-2', title: '重复条目二', summary: '状态机定义', body: '状态机由状态和转移组成。', topic: '测试', status: 'active', source_ids: [], relations: [], evidence: [] },
+      { knowledge_id: 'unique', title: '唯一条目', summary: '状态机应用', body: '状态机可以描述流程。', topic: '测试', status: 'active', source_ids: [], relations: [], evidence: [] }
+    ],
+    sources: [],
+    aliases: []
+  };
+  const result = retrieve(duplicateDataset, '状态机', { minScore: 1, limit: 2 });
+  assert.equal(result.direct.length, 2);
+  assert.equal(new Set(result.direct.map(({ item }) => item.body)).size, 2);
+  assert.ok(result.direct.some(({ item }) => item.knowledge_id === 'unique'));
+});
+
+test('标题相同但正文不同的条目不会被去重', () => {
+  const result = retrieve({
+    knowledge: [
+      { knowledge_id: 'same-title-1', title: '同名主题', summary: '第一内容', body: '第一内容', topic: '测试', status: 'active', source_ids: [], relations: [], evidence: [] },
+      { knowledge_id: 'same-title-2', title: '同名主题', summary: '第二内容', body: '第二内容', topic: '测试', status: 'active', source_ids: [], relations: [], evidence: [] }
+    ],
+    sources: [],
+    aliases: []
+  }, '同名主题', { minScore: 1, limit: 2 });
+  assert.equal(result.direct.length, 2);
+});
+
